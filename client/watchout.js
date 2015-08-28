@@ -43,15 +43,29 @@ var createEnemies = function() {
   });
 };
 
-var renderEnemies = d3
-  .select('svg')
+var renderEnemies = d3.select('svg')
   .selectAll('circle')
   .data(createEnemies, function(d) { return d.id })
   .enter()
   .append('svg:circle')
-  .attr("class", "enemy")
+  .transition()
+  .attr("fill", "black")
   .attr("cx", function(d) { return axes.x(d.x) })
   .attr("cy", function(d) { return axes.y(d.y) })
   .attr("r", gameOptions.enemyRadius)
 
-renderEnemies();
+setInterval( function() {
+  d3
+  .selectAll('circle')
+  .transition()
+  .duration(1000)
+  .attr("cx", function(d) {
+    d.x = Math.random() * 100;
+    return axes.x(d.x);
+   })
+  .attr("cy", function(d) {
+    d.y = Math.random() * 100;
+    return axes.y(d.y);
+   })
+}
+, 1000)
