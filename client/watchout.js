@@ -43,20 +43,54 @@ var createEnemies = function() {
   });
 };
 
-var renderEnemies = d3.select('svg')
-  .selectAll('circle')
+var Player = function() {
+  this.r  = 5;
+  this.color = "red";
+};
+
+var drag = d3.behavior.drag()
+    .on("drag", dragmove);
+
+function dragmove(d) {
+  d3.select(this)
+      .attr("cx", d.x = Math.max(20, Math.min(gameOptions.width - 20, d3.event.x)))
+      .attr("cy", d.y = Math.max(20, Math.min(gameOptions.height - 20, d3.event.y)));
+}
+
+var newPlayer = [new Player()];
+
+var player = d3.select('svg')
+  .selectAll('.player')
+  .data(newPlayer)
+  .enter()
+  .append('svg:circle')
+  .call(drag)
+  .transition()
+  .duration(2000)
+  .attr("class", "player")
+  .attr("fill", function(d) { return d.color })
+  .attr("cx", function(d) { return axes.x(50) })
+  .attr("cy", function(d) { return axes.y(50) })
+  .attr("r", function(d) { return d.r })
+  .transition()
+  .duration(2000)
+  .attr("r", "20px")
+
+d3.select('svg')
+  .selectAll('circle.enemy')
   .data(createEnemies, function(d) { return d.id })
   .enter()
   .append('svg:circle')
   .transition()
+  .attr("class", "enemy")
   .attr("fill", "black")
   .attr("cx", function(d) { return axes.x(d.x) })
   .attr("cy", function(d) { return axes.y(d.y) })
-  .attr("r", gameOptions.enemyRadius)
+  .attr("r", gameOptions.enemyRadius);
 
 setInterval( function() {
   d3
-  .selectAll('circle')
+  .selectAll('circle.enemy')
   .transition()
   .duration(1000)
   .attr("cx", function(d) {
