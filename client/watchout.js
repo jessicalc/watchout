@@ -43,6 +43,20 @@ var createEnemies = function() {
   });
 };
 
+// var enemiesArray = []; 
+
+// var createEnemies = function() {
+//   for (var i = 0; i < gameOptions.enemies; i++) {
+//     var enemy = {};
+//     enemy.id = i;
+//     enemy.x = Math.random() * 100;
+//     enemy.y = Math.random() * 100;
+//     enemiesArray.push(enemy);
+//   }
+//   return enemiesArray;
+//   // run check collisions inside create enemies - 
+// }
+
 var Player = function() {
   this.r  = 5;
   this.color = "red";
@@ -76,7 +90,7 @@ var player = d3.select('svg')
   .duration(2000)
   .attr("r", "20px")
 
-d3.select('svg')
+var enemy = d3.select('svg')
   .selectAll('circle.enemy')
   .data(createEnemies, function(d) { return d.id })
   .enter()
@@ -86,7 +100,8 @@ d3.select('svg')
   .attr("fill", "black")
   .attr("cx", function(d) { return axes.x(d.x) })
   .attr("cy", function(d) { return axes.y(d.y) })
-  .attr("r", gameOptions.enemyRadius);
+  .attr("r", gameOptions.enemyRadius)
+
 
 setInterval( function() {
   d3
@@ -103,3 +118,19 @@ setInterval( function() {
    })
 }
 , 1000)
+
+var detectCollision = function(item) {
+  // i don't know how to make this happen for each enemy element 
+  var player = d3.select('svg').selectAll('.player');
+  var enemies = d3.select('svg').select('.enemy');
+  // var sumRadius = parseInt(player.attr("r")) + parseInt(this.attr("r"));
+  console.log(enemies);
+  // var distance = Math.sqrt(Math.pow(Math.abs(player.attr("cx") - this.attr("cx")), 2) + Math.pow(Math.abs(player.attr("cy") - enemy.attr("cy")), 2)); // pyth
+  // return distance;
+  // if (distance < sumRadius) {
+    // d3.select('gameboard').style('background-color', 'red');
+    // console.log("you collided");
+  // }
+}
+
+// _.each(createEnemies(), function(item) { detectCollision.call(item)} )
