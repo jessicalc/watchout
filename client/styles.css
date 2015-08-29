@@ -23,11 +23,12 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
+  width: 130px;
   padding: 10px;
   font-family: 'comic sans ms', helvetica, sans-serif;
   font-size: 12px;
 }
 
 .enemy {
-  fill: black;
+  background-image: url('assets/poop.png');
 }
