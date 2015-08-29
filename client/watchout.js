@@ -34,8 +34,8 @@ var updateCollisionCount = function() {
 };
 
 var updateBestScore = function() {
-  gameStats.bestScore = _.max(gameStats.bestScore, gameStats.score);
-  d3.select(".high").test(gameStats.bestScore.toString());
+  gameStats.bestScore = Math.max(gameStats.bestScore, gameStats.score);
+  d3.select(".high").text("High score: " + gameStats.bestScore.toString());
 };
 
 var createEnemies = function() {
@@ -49,7 +49,9 @@ var createEnemies = function() {
 };
 
 var Player = function() {
-  this.r  = 10;
+  this.r = 10;
+  this.x = gameOptions.width/2;
+  this.y = gameOptions.height/2;
   this.color = "red";
 };
 
@@ -57,9 +59,10 @@ var drag = d3.behavior.drag()
     .on("drag", dragmove);
 
 function dragmove(d) {
+  var playerRadius = player.data()[0].r;
   d3.select(this)
-      .attr("cx", d.x = Math.max(20, Math.min(gameOptions.width - 20, d3.event.x)))
-      .attr("cy", d.y = Math.max(20, Math.min(gameOptions.height - 20, d3.event.y)));
+      .attr("cx", d.x = Math.max(playerRadius, Math.min(gameOptions.width - playerRadius, d3.event.x)))
+      .attr("cy", d.y = Math.max(playerRadius, Math.min(gameOptions.height - playerRadius, d3.event.y)));
 }
 
 var newPlayer = [new Player()];
@@ -92,35 +95,12 @@ var renderEnemies = function() {
 
   enemies.exit().remove();
 
-  /*.transition()
-  .duration(1000)
-  .tween("custom", detectCollision)
-  */
-
   return enemies.transition().duration(1000).tween('custom', detectCollision);
 };
 
 setInterval(function() {
   renderEnemies();
-  // console.log("DONE AT SETINTERVAL")
 }, 1000)
-
-// setInterval( function() {
-//   d3
-//   .selectAll('circle.enemy')
-//   .transition()
-//   .duration(1000)
-//   .attr("cx", function(d) {
-//     d.x = Math.random() * 100;
-//     return axes.x(d.x);
-//    })
-//   .attr("cy", function(d) {
-//     d.y = Math.random() * 100;
-//     return axes.y(d.y);
-//    })
-//   .tween("custom", detectCollision)
-// }
-// , 1000)
 
 var detectCollision = function(item) {
   var enemy = d3.select(this);
@@ -144,42 +124,24 @@ var detectCollision = function(item) {
 
   return function(percent) {
 
-    var nextPos = {
-      x: oldData.cx + (newData.x - oldData.cx) * percent,
-      y: oldData.cy + (newData.y - oldData.cy) * percent
+    var enemyPos = {
+      x: Math.round(oldData.cx + (newData.x - oldData.cx) * percent),
+      y: Math.round(oldData.cy + (newData.y - oldData.cy) * percent)
     };
-    console.log(nextPos);
-    return enemy.attr('cx', nextPos.x).attr('cy', nextPos.y);
-    // console.log(d3.select(this).attr("cx"))
-    //console.log(item);
-    //console.log(percent);
-    // console.log(this);
-    // console.log(d3.select(this).attr("cx"));
-    //console.log("old position is " + item.x + "(" + item.id + ") while new position is: " + d3.select(this).attr("cx") + "(" + d3.select(this).data()[0].id + ")");
-    //console.log(item, d3.select(this));
-    //d3.select(this).attr("cx", Math.random()*100);
-    //console.log(item, t);
-    // var old = item;
-    // var newData = d3.select(this).data()[0];
+    enemy.attr('cx', enemyPos.x).attr('cy', enemyPos.y);
 
-    // if (old.id == 0) {
-    //    console.log("Old: " + old.x + " | New: " + newData.x + " | Difference: " + (old.x - newData.x) + " | Percent: " + percent);
-    // }
-    //d3.select(this).attr("")
-    // console.log("FINISHED AT DETECT COLLISION");
+    var playerPos = player.data()[0];
 
+    var distance = Math.sqrt(Math.pow(Math.abs(playerPos.x - enemyPos.x), 2) + Math.pow(Math.abs(playerPos.y - enemyPos.y), 2));
+    var sumRadius = playerPos.r + gameOptions.enemyRadius;
 
-    // // i don't know how to make this happen for each enemy element 
-    // var player = d3.select('svg').selectAll('.player');
-    // var enemies = d3.select('svg').select('.enemy');
-    // var sumRadius = parseInt(player.attr("r")) + parseInt(this.attr("r"));
-
-    // var distance = Math.sqrt(Math.pow(Math.abs(player.attr("cx") - this.attr("cx")), 2) + Math.pow(Math.abs(player.attr("cy") - enemy.attr("cy")), 2)); // pyth
-    // return distance;
-    // if (distance < sumRadius) {
-    //   d3.select('gameboard').style('background-color', 'red');
-    //   console.log("you collided");
-    // }
+    if (distance < sumRadius) {
+      gameStats.collisions++;
+      updateBestScore();
+      updateCollisionCount();
+      gameStats.score = 0;
+      console.log("You've been hit!");
+    }
   }
 }
 
