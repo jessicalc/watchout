@@ -66,8 +66,10 @@ var drag = d3.behavior.drag()
 
 function dragmove(d) {
   var playerRadius = player.data()[0].r;
+  if (gameStats.counter > 100) {
+    d3.select(".player").attr("xlink:href", "assets/" + player.data()[0].happinessLevel + ".png");
+  }
   gameStats.counter = 0;
-
   d3.select(this)
       .attr("x", d.x = Math.max(playerRadius, Math.min(gameOptions.width - playerRadius, d3.event.x)) - playerRadius)
       .attr("y", d.y = Math.max(playerRadius, Math.min(gameOptions.height - playerRadius, d3.event.y)) - playerRadius);
