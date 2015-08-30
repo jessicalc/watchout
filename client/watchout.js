@@ -106,7 +106,10 @@ var renderEnemies = function() {
   .attr("y", function(d) {
     return axes.y(d.y)
   })
-  .attr("r", gameOptions.enemyRadius);
+  .attr("r", gameOptions.enemyRadius)
+  .each(function(d) {
+    d3.select(this).style("transform-origin", "50% 50%");
+  })
 
   enemies.exit().remove();
 
@@ -119,9 +122,7 @@ setInterval(function() {
 }, 1000)
 
 var detectCollision = function(item) {
-  console.log(item);
   var enemy = d3.select(this);
-  console.log(enemy);
 
   var newCoords = {
     x: Math.random() * 100,
@@ -176,7 +177,6 @@ var detectCollision = function(item) {
       updateBestScore();
       updateCollisionCount();
       gameStats.score = 0;
-      console.log("You've been hit!");
       player.data()[0].happinessLevel = happyLevel;
     }
   }
